@@ -1,0 +1,2 @@
+import { db,pool } from '../src/config/database.js'; import { hashPassword } from '../src/utils/password.util.js';
+const [email,password,name='Administrator']=process.argv.slice(2);if(!email||!password){console.error('Usage: npm run create:admin -- admin@example.com StrongPassword "Admin Name"');process.exit(1);}const hash=await hashPassword(password);const result=await db.query('INSERT INTO health.app_user(email,password,display_name,is_staff,is_superuser) VALUES(lower($1),$2,$3,true,true) RETURNING id,email',[email,hash,name]);console.log(result.rows[0]);await pool.end();

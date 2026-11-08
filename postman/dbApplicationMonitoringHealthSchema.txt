@@ -1,0 +1,1165 @@
+BEGIN;
+
+-- =========================================================
+-- AUTOMATIC APPLICATION HEALTH CHECK DATABASE
+-- PostgreSQL DDL
+-- =========================================================
+
+-- WARNING:
+-- Uncomment only when you intentionally want to delete
+-- the existing schema and all its data.
+--
+-- DROP SCHEMA IF EXISTS health CASCADE;
+
+CREATE SCHEMA IF NOT EXISTS health;
+
+SET search_path TO health, public;
+
+
+-- =========================================================
+-- UPDATED-AT TRIGGER FUNCTION
+-- Automatically updates updated_at during an UPDATE.
+-- =========================================================
+
+CREATE OR REPLACE FUNCTION health.set_updated_at()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$;
+
+
+-- =========================================================
+-- 1. USERS
+--
+-- Django stores a salted password hash in the "password"
+-- column. Never store a plain-text password.
+-- =========================================================
+
+CREATE TABLE health.app_user (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email               VARCHAR(255) NOT NULL,
+    password            VARCHAR(255) NOT NULL,
+    display_name        VARCHAR(150) NOT NULL,
+
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+    is_staff            BOOLEAN NOT NULL DEFAULT FALSE,
+    is_superuser        BOOLEAN NOT NULL DEFAULT FALSE,
+
+    last_login          TIMESTAMPTZ,
+    date_joined         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_app_user_email
+        UNIQUE (email),
+
+    CONSTRAINT chk_app_user_email
+        CHECK (POSITION('@' IN email) > 1)
+);
+
+
+-- =========================================================
+-- 2. ROLES
+--
+-- Examples:
+-- ADMIN
+-- COUNTRY_ADMIN
+-- OPERATOR
+-- VIEWER
+-- =========================================================
+
+CREATE TABLE health.app_role (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name                VARCHAR(100) NOT NULL,
+    code                VARCHAR(50) NOT NULL,
+    description         TEXT,
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_app_role_name
+        UNIQUE (name),
+
+    CONSTRAINT uq_app_role_code
+        UNIQUE (code),
+
+    CONSTRAINT chk_app_role_code
+        CHECK (code ~ '^[A-Z][A-Z0-9_]*$')
+);
+
+
+-- =========================================================
+-- 3. PERMISSIONS
+--
+-- Examples:
+-- VIEW_APPLICATION
+-- MANAGE_APPLICATION
+-- VIEW_HEALTH_STATUS
+-- MANAGE_MONITORING_CONFIG
+-- ACKNOWLEDGE_INCIDENT
+-- RESOLVE_INCIDENT
+-- =========================================================
+
+CREATE TABLE health.permission (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name                VARCHAR(150) NOT NULL,
+    code                VARCHAR(100) NOT NULL,
+    description         TEXT,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_permission_name
+        UNIQUE (name),
+
+    CONSTRAINT uq_permission_code
+        UNIQUE (code),
+
+    CONSTRAINT chk_permission_code
+        CHECK (code ~ '^[A-Z][A-Z0-9_]*$')
+);
+
+
+-- =========================================================
+-- 4. USER-TO-ROLE RELATIONSHIP
+-- =========================================================
+
+CREATE TABLE health.user_role (
+    user_id             BIGINT NOT NULL,
+    role_id             BIGINT NOT NULL,
+
+    assigned_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    assigned_by         BIGINT,
+
+    PRIMARY KEY (user_id, role_id),
+
+    CONSTRAINT fk_user_role_user
+        FOREIGN KEY (user_id)
+        REFERENCES health.app_user(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_user_role_role
+        FOREIGN KEY (role_id)
+        REFERENCES health.app_role(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_user_role_assigned_by
+        FOREIGN KEY (assigned_by)
+        REFERENCES health.app_user(id)
+        ON DELETE SET NULL
+);
+
+
+-- =========================================================
+-- 5. ROLE-TO-PERMISSION RELATIONSHIP
+-- =========================================================
+
+CREATE TABLE health.role_permission (
+    role_id             BIGINT NOT NULL,
+    permission_id       BIGINT NOT NULL,
+
+    assigned_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    assigned_by         BIGINT,
+
+    PRIMARY KEY (role_id, permission_id),
+
+    CONSTRAINT fk_role_permission_role
+        FOREIGN KEY (role_id)
+        REFERENCES health.app_role(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_role_permission_permission
+        FOREIGN KEY (permission_id)
+        REFERENCES health.permission(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_role_permission_assigned_by
+        FOREIGN KEY (assigned_by)
+        REFERENCES health.app_user(id)
+        ON DELETE SET NULL
+);
+
+
+-- =========================================================
+-- 6. COUNTRIES
+--
+-- ISO examples:
+-- DE, NL, FR, PT, IN
+-- =========================================================
+
+CREATE TABLE health.country (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name                VARCHAR(100) NOT NULL,
+    iso_code            VARCHAR(2) NOT NULL,
+
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at          TIMESTAMPTZ,
+
+    CONSTRAINT uq_country_name
+        UNIQUE (name),
+
+    CONSTRAINT uq_country_iso_code
+        UNIQUE (iso_code),
+
+    CONSTRAINT chk_country_iso_code
+        CHECK (iso_code ~ '^[A-Z]{2}$')
+);
+
+
+-- =========================================================
+-- 7. USER COUNTRY ACCESS
+--
+-- Enables different access levels per country.
+--
+-- Example:
+-- User is COUNTRY_ADMIN for Germany
+-- User is VIEWER for Netherlands
+-- =========================================================
+
+CREATE TABLE health.user_country_access (
+    user_id             BIGINT NOT NULL,
+    country_id          BIGINT NOT NULL,
+
+    access_level        VARCHAR(30) NOT NULL DEFAULT 'VIEWER',
+
+    granted_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    granted_by          BIGINT,
+
+    PRIMARY KEY (user_id, country_id),
+
+    CONSTRAINT fk_user_country_user
+        FOREIGN KEY (user_id)
+        REFERENCES health.app_user(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_user_country_country
+        FOREIGN KEY (country_id)
+        REFERENCES health.country(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_user_country_granted_by
+        FOREIGN KEY (granted_by)
+        REFERENCES health.app_user(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT chk_user_country_access_level
+        CHECK (
+            access_level IN (
+                'VIEWER',
+                'OPERATOR',
+                'COUNTRY_ADMIN'
+            )
+        )
+);
+
+
+-- =========================================================
+-- 8. APPLICATIONS
+--
+-- One application belongs to one country.
+-- =========================================================
+
+CREATE TABLE health.application (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    country_id          BIGINT NOT NULL,
+
+    name                VARCHAR(200) NOT NULL,
+    code                VARCHAR(100) NOT NULL,
+    description         TEXT,
+
+    owner_team          VARCHAR(200),
+    documentation_url   TEXT,
+
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at          TIMESTAMPTZ,
+
+    CONSTRAINT fk_application_country
+        FOREIGN KEY (country_id)
+        REFERENCES health.country(id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT uq_application_country_name
+        UNIQUE (country_id, name),
+
+    CONSTRAINT uq_application_country_code
+        UNIQUE (country_id, code),
+
+    CONSTRAINT chk_application_code
+        CHECK (code ~ '^[A-Za-z0-9][A-Za-z0-9_-]*$'),
+
+    CONSTRAINT chk_application_documentation_url
+        CHECK (
+            documentation_url IS NULL
+            OR documentation_url ~* '^https?://'
+        )
+);
+
+
+-- =========================================================
+-- 9. ENVIRONMENTS
+--
+-- Each application can have:
+-- PRODUCTION
+-- PRE_PRODUCTION
+-- =========================================================
+
+CREATE TABLE health.environment (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    application_id      BIGINT NOT NULL,
+
+    name                VARCHAR(30) NOT NULL,
+    base_url            TEXT,
+
+    enabled             BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at          TIMESTAMPTZ,
+
+    CONSTRAINT fk_environment_application
+        FOREIGN KEY (application_id)
+        REFERENCES health.application(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_environment_application_name
+        UNIQUE (application_id, name),
+
+    CONSTRAINT chk_environment_name
+        CHECK (
+            name IN (
+                'PRODUCTION',
+                'PRE_PRODUCTION'
+            )
+        ),
+
+    CONSTRAINT chk_environment_base_url
+        CHECK (
+            base_url IS NULL
+            OR base_url ~* '^https?://'
+        )
+);
+
+
+-- =========================================================
+-- 10. COMPONENTS
+--
+-- Create one component record per actual monitorable item.
+--
+-- Examples:
+-- Production UI
+-- Node Server 01
+-- Node Server 02
+-- PostgreSQL Database
+-- SAP Interface
+-- SSL Certificate
+-- =========================================================
+
+CREATE TABLE health.component (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    environment_id      BIGINT NOT NULL,
+
+    name                VARCHAR(200) NOT NULL,
+    component_type      VARCHAR(30) NOT NULL,
+
+    endpoint            TEXT,
+    host_name           VARCHAR(255),
+    port                INTEGER,
+
+    instance_number     INTEGER,
+    technology          VARCHAR(100),
+    version             VARCHAR(100),
+
+    is_critical         BOOLEAN NOT NULL DEFAULT TRUE,
+    enabled             BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at          TIMESTAMPTZ,
+
+    CONSTRAINT fk_component_environment
+        FOREIGN KEY (environment_id)
+        REFERENCES health.environment(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_component_environment_name
+        UNIQUE (environment_id, name),
+
+    -- Required for the composite foreign key used by incident.
+    CONSTRAINT uq_component_environment_id
+        UNIQUE (environment_id, id),
+
+    CONSTRAINT chk_component_type
+        CHECK (
+            component_type IN (
+                'UI',
+                'APPLICATION_SERVER',
+                'NODE_SERVER',
+                'DATABASE',
+                'INTERFACE',
+                'SSL_CERTIFICATE',
+                'INSTANCE',
+                'OTHER'
+            )
+        ),
+
+    CONSTRAINT chk_component_endpoint
+        CHECK (
+            endpoint IS NULL
+            OR endpoint ~* '^https?://'
+        ),
+
+    CONSTRAINT chk_component_port
+        CHECK (
+            port IS NULL
+            OR port BETWEEN 1 AND 65535
+        ),
+
+    CONSTRAINT chk_component_instance_number
+        CHECK (
+            instance_number IS NULL
+            OR instance_number > 0
+        ),
+
+    CONSTRAINT chk_component_target
+        CHECK (
+            endpoint IS NOT NULL
+            OR host_name IS NOT NULL
+        )
+);
+
+
+-- =========================================================
+-- 11. MONITORING CONFIGURATION
+--
+-- A component can have multiple monitoring checks.
+--
+-- Examples:
+-- UI component       -> HTTP and SSL
+-- Database component -> TCP and DATABASE
+--
+-- Only one configuration per component/check_type.
+-- =========================================================
+
+CREATE TABLE health.monitoring_config (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    component_id        BIGINT NOT NULL,
+
+    check_type          VARCHAR(30) NOT NULL,
+
+    interval_seconds    INTEGER NOT NULL DEFAULT 60,
+    timeout_seconds     INTEGER NOT NULL DEFAULT 10,
+
+    http_method         VARCHAR(10),
+    expected_status     INTEGER,
+    expected_body       TEXT,
+
+    failure_threshold   INTEGER NOT NULL DEFAULT 3,
+    recovery_threshold  INTEGER NOT NULL DEFAULT 2,
+
+    warning_threshold_ms INTEGER,
+
+    enabled             BOOLEAN NOT NULL DEFAULT TRUE,
+
+    last_dispatched_at  TIMESTAMPTZ,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at          TIMESTAMPTZ,
+
+    CONSTRAINT fk_monitoring_config_component
+        FOREIGN KEY (component_id)
+        REFERENCES health.component(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_monitoring_component_check_type
+        UNIQUE (component_id, check_type),
+
+    CONSTRAINT chk_monitoring_check_type
+        CHECK (
+            check_type IN (
+                'HTTP',
+                'TCP',
+                'DATABASE',
+                'SSL',
+                'INTERFACE',
+                'INSTANCE',
+                'CUSTOM'
+            )
+        ),
+
+    CONSTRAINT chk_monitoring_http_method
+        CHECK (
+            http_method IS NULL
+            OR http_method IN (
+                'GET',
+                'POST',
+                'HEAD'
+            )
+        ),
+
+    CONSTRAINT chk_monitoring_interval
+        CHECK (interval_seconds >= 10),
+
+    CONSTRAINT chk_monitoring_timeout
+        CHECK (
+            timeout_seconds > 0
+            AND timeout_seconds <= interval_seconds
+        ),
+
+    CONSTRAINT chk_monitoring_expected_status
+        CHECK (
+            expected_status IS NULL
+            OR expected_status BETWEEN 100 AND 599
+        ),
+
+    CONSTRAINT chk_monitoring_failure_threshold
+        CHECK (failure_threshold > 0),
+
+    CONSTRAINT chk_monitoring_recovery_threshold
+        CHECK (recovery_threshold > 0),
+
+    CONSTRAINT chk_monitoring_warning_threshold
+        CHECK (
+            warning_threshold_ms IS NULL
+            OR warning_threshold_ms >= 0
+        )
+);
+
+
+-- =========================================================
+-- 12. HEALTH CHECKS
+--
+-- Append-only monitoring results.
+--
+-- The result references monitoring_config, from which the
+-- component and check type can be identified.
+-- =========================================================
+
+CREATE TABLE health.health_check (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    monitoring_config_id BIGINT NOT NULL,
+
+    status              VARCHAR(20) NOT NULL,
+    response_time_ms    INTEGER,
+
+    checked_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    status_code         INTEGER,
+    safe_error_code     VARCHAR(100),
+    error_message       TEXT,
+
+    details             JSONB NOT NULL DEFAULT '{}'::JSONB,
+
+    CONSTRAINT fk_health_check_monitoring_config
+        FOREIGN KEY (monitoring_config_id)
+        REFERENCES health.monitoring_config(id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT chk_health_check_status
+        CHECK (
+            status IN (
+                'UP',
+                'DOWN',
+                'DEGRADED',
+                'UNKNOWN',
+                'TIMEOUT'
+            )
+        ),
+
+    CONSTRAINT chk_health_response_time
+        CHECK (
+            response_time_ms IS NULL
+            OR response_time_ms >= 0
+        ),
+
+    CONSTRAINT chk_health_status_code
+        CHECK (
+            status_code IS NULL
+            OR status_code BETWEEN 100 AND 599
+        ),
+
+    CONSTRAINT chk_health_details_object
+        CHECK (jsonb_typeof(details) = 'object')
+);
+
+
+-- =========================================================
+-- 13. INCIDENTS
+--
+-- An incident always belongs to an environment.
+-- It can optionally belong to a specific component.
+--
+-- Composite foreign key ensures that the component belongs
+-- to the selected environment.
+-- =========================================================
+
+CREATE TABLE health.incident (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    environment_id      BIGINT NOT NULL,
+    component_id        BIGINT,
+
+    started_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    acknowledged_at     TIMESTAMPTZ,
+    resolved_at         TIMESTAMPTZ,
+    closed_at           TIMESTAMPTZ,
+
+    acknowledged_by     BIGINT,
+    resolved_by         BIGINT,
+
+    severity            VARCHAR(20) NOT NULL,
+    summary             VARCHAR(500) NOT NULL,
+    description         TEXT,
+
+    state               VARCHAR(20) NOT NULL DEFAULT 'OPEN',
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_incident_environment
+        FOREIGN KEY (environment_id)
+        REFERENCES health.environment(id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_incident_environment_component
+        FOREIGN KEY (environment_id, component_id)
+        REFERENCES health.component(environment_id, id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_incident_acknowledged_by
+        FOREIGN KEY (acknowledged_by)
+        REFERENCES health.app_user(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_incident_resolved_by
+        FOREIGN KEY (resolved_by)
+        REFERENCES health.app_user(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT chk_incident_severity
+        CHECK (
+            severity IN (
+                'LOW',
+                'MEDIUM',
+                'HIGH',
+                'CRITICAL'
+            )
+        ),
+
+    CONSTRAINT chk_incident_state
+        CHECK (
+            state IN (
+                'OPEN',
+                'ACKNOWLEDGED',
+                'INVESTIGATING',
+                'RESOLVED',
+                'CLOSED'
+            )
+        ),
+
+    CONSTRAINT chk_incident_acknowledgement_time
+        CHECK (
+            acknowledged_at IS NULL
+            OR acknowledged_at >= started_at
+        ),
+
+    CONSTRAINT chk_incident_resolution_time
+        CHECK (
+            resolved_at IS NULL
+            OR resolved_at >= started_at
+        ),
+
+    CONSTRAINT chk_incident_closed_time
+        CHECK (
+            closed_at IS NULL
+            OR resolved_at IS NOT NULL
+            AND closed_at >= resolved_at
+        ),
+
+    CONSTRAINT chk_incident_resolved_state
+        CHECK (
+            state NOT IN ('RESOLVED', 'CLOSED')
+            OR resolved_at IS NOT NULL
+        )
+);
+
+
+-- =========================================================
+-- 14. AUDIT LOGS
+--
+-- target_type can be:
+-- APPLICATION
+-- ENVIRONMENT
+-- COMPONENT
+-- MONITORING_CONFIG
+-- INCIDENT
+-- USER_COUNTRY_ACCESS
+-- =========================================================
+
+CREATE TABLE health.audit_log (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    actor_user_id       BIGINT,
+
+    action              VARCHAR(100) NOT NULL,
+    target_type         VARCHAR(100) NOT NULL,
+    target_id           BIGINT,
+
+    old_values          JSONB,
+    new_values          JSONB,
+
+    request_id          UUID,
+    http_method         VARCHAR(10),
+    request_path        TEXT,
+    ip_address          INET,
+    user_agent          TEXT,
+
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_audit_log_actor
+        FOREIGN KEY (actor_user_id)
+        REFERENCES health.app_user(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT chk_audit_log_action
+        CHECK (action ~ '^[A-Z][A-Z0-9_]*$'),
+
+    CONSTRAINT chk_audit_log_http_method
+        CHECK (
+            http_method IS NULL
+            OR http_method IN (
+                'GET',
+                'POST',
+                'PUT',
+                'PATCH',
+                'DELETE'
+            )
+        ),
+
+    CONSTRAINT chk_audit_old_values
+        CHECK (
+            old_values IS NULL
+            OR jsonb_typeof(old_values) = 'object'
+        ),
+
+    CONSTRAINT chk_audit_new_values
+        CHECK (
+            new_values IS NULL
+            OR jsonb_typeof(new_values) = 'object'
+        )
+);
+
+
+-- =========================================================
+-- AUTOMATIC UPDATED_AT TRIGGERS
+-- =========================================================
+
+CREATE TRIGGER trg_app_user_updated_at
+BEFORE UPDATE ON health.app_user
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_app_role_updated_at
+BEFORE UPDATE ON health.app_role
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_permission_updated_at
+BEFORE UPDATE ON health.permission
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_country_updated_at
+BEFORE UPDATE ON health.country
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_application_updated_at
+BEFORE UPDATE ON health.application
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_environment_updated_at
+BEFORE UPDATE ON health.environment
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_component_updated_at
+BEFORE UPDATE ON health.component
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_monitoring_config_updated_at
+BEFORE UPDATE ON health.monitoring_config
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+CREATE TRIGGER trg_incident_updated_at
+BEFORE UPDATE ON health.incident
+FOR EACH ROW
+EXECUTE FUNCTION health.set_updated_at();
+
+
+-- =========================================================
+-- INDEXES FOR AUTHORIZATION
+-- =========================================================
+
+CREATE INDEX idx_user_role_role
+    ON health.user_role(role_id);
+
+CREATE INDEX idx_role_permission_permission
+    ON health.role_permission(permission_id);
+
+CREATE INDEX idx_user_country_country
+    ON health.user_country_access(country_id);
+
+CREATE INDEX idx_user_country_access_level
+    ON health.user_country_access(access_level);
+
+
+-- =========================================================
+-- INDEXES FOR APPLICATION INVENTORY
+-- =========================================================
+
+CREATE INDEX idx_application_country
+    ON health.application(country_id);
+
+CREATE INDEX idx_application_active
+    ON health.application(is_active)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_environment_application
+    ON health.environment(application_id);
+
+CREATE INDEX idx_environment_enabled
+    ON health.environment(enabled)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_component_environment
+    ON health.component(environment_id);
+
+CREATE INDEX idx_component_type
+    ON health.component(component_type);
+
+CREATE INDEX idx_component_enabled
+    ON health.component(enabled)
+    WHERE deleted_at IS NULL;
+
+
+-- =========================================================
+-- INDEXES FOR MONITORING
+-- =========================================================
+
+CREATE INDEX idx_monitoring_config_component
+    ON health.monitoring_config(component_id);
+
+CREATE INDEX idx_monitoring_config_enabled
+    ON health.monitoring_config(enabled, last_dispatched_at)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_monitoring_config_check_type
+    ON health.monitoring_config(check_type);
+
+CREATE INDEX idx_health_check_config_checked
+    ON health.health_check(
+        monitoring_config_id,
+        checked_at DESC
+    );
+
+CREATE INDEX idx_health_check_status_checked
+    ON health.health_check(
+        status,
+        checked_at DESC
+    );
+
+CREATE INDEX idx_health_check_checked_at
+    ON health.health_check(checked_at DESC);
+
+CREATE INDEX idx_health_check_details
+    ON health.health_check
+    USING GIN (details);
+
+
+-- =========================================================
+-- INDEXES FOR INCIDENTS
+-- =========================================================
+
+CREATE INDEX idx_incident_environment_state
+    ON health.incident(environment_id, state);
+
+CREATE INDEX idx_incident_component
+    ON health.incident(component_id);
+
+CREATE INDEX idx_incident_started_at
+    ON health.incident(started_at DESC);
+
+CREATE INDEX idx_incident_severity_state
+    ON health.incident(severity, state);
+
+
+-- Prevent multiple active incidents for the same component.
+CREATE UNIQUE INDEX uq_active_incident_component
+    ON health.incident(component_id)
+    WHERE component_id IS NOT NULL
+      AND state IN (
+          'OPEN',
+          'ACKNOWLEDGED',
+          'INVESTIGATING'
+      );
+
+
+-- Prevent multiple active environment-wide incidents
+-- having the same summary for the same environment.
+CREATE UNIQUE INDEX uq_active_environment_incident
+    ON health.incident(environment_id, summary)
+    WHERE component_id IS NULL
+      AND state IN (
+          'OPEN',
+          'ACKNOWLEDGED',
+          'INVESTIGATING'
+      );
+
+
+-- =========================================================
+-- INDEXES FOR AUDIT LOGS
+-- =========================================================
+
+CREATE INDEX idx_audit_log_actor
+    ON health.audit_log(actor_user_id);
+
+CREATE INDEX idx_audit_log_target
+    ON health.audit_log(target_type, target_id);
+
+CREATE INDEX idx_audit_log_created
+    ON health.audit_log(created_at DESC);
+
+CREATE INDEX idx_audit_log_request_id
+    ON health.audit_log(request_id);
+
+
+-- =========================================================
+-- DEFAULT ROLES
+-- =========================================================
+
+INSERT INTO health.app_role (
+    name,
+    code,
+    description
+)
+VALUES
+    (
+        'Administrator',
+        'ADMIN',
+        'Global administrator with access to all countries and functions.'
+    ),
+    (
+        'Country Administrator',
+        'COUNTRY_ADMIN',
+        'Administrator for assigned countries.'
+    ),
+    (
+        'Operator',
+        'OPERATOR',
+        'Can monitor applications and manage incidents.'
+    ),
+    (
+        'Viewer',
+        'VIEWER',
+        'Read-only access to assigned countries.'
+    )
+ON CONFLICT (code) DO NOTHING;
+
+
+-- =========================================================
+-- DEFAULT PERMISSIONS
+-- =========================================================
+
+INSERT INTO health.permission (
+    name,
+    code,
+    description
+)
+VALUES
+    (
+        'View countries',
+        'VIEW_COUNTRY',
+        'View assigned countries.'
+    ),
+    (
+        'Manage countries',
+        'MANAGE_COUNTRY',
+        'Create and update country records.'
+    ),
+    (
+        'View applications',
+        'VIEW_APPLICATION',
+        'View applications for assigned countries.'
+    ),
+    (
+        'Manage applications',
+        'MANAGE_APPLICATION',
+        'Create and update applications.'
+    ),
+    (
+        'View environments',
+        'VIEW_ENVIRONMENT',
+        'View production and pre-production environments.'
+    ),
+    (
+        'Manage environments',
+        'MANAGE_ENVIRONMENT',
+        'Create and update application environments.'
+    ),
+    (
+        'View components',
+        'VIEW_COMPONENT',
+        'View application components.'
+    ),
+    (
+        'Manage components',
+        'MANAGE_COMPONENT',
+        'Create and update application components.'
+    ),
+    (
+        'View health status',
+        'VIEW_HEALTH_STATUS',
+        'View current and historical monitoring results.'
+    ),
+    (
+        'Manage monitoring configuration',
+        'MANAGE_MONITORING_CONFIG',
+        'Create and modify monitoring configuration.'
+    ),
+    (
+        'View incidents',
+        'VIEW_INCIDENT',
+        'View application incidents.'
+    ),
+    (
+        'Acknowledge incidents',
+        'ACKNOWLEDGE_INCIDENT',
+        'Acknowledge open incidents.'
+    ),
+    (
+        'Investigate incidents',
+        'INVESTIGATE_INCIDENT',
+        'Change incidents to investigating state.'
+    ),
+    (
+        'Resolve incidents',
+        'RESOLVE_INCIDENT',
+        'Resolve application incidents.'
+    ),
+    (
+        'View audit logs',
+        'VIEW_AUDIT_LOG',
+        'View administrative audit logs.'
+    )
+ON CONFLICT (code) DO NOTHING;
+
+
+-- =========================================================
+-- DEFAULT ROLE-PERMISSION MAPPING
+-- =========================================================
+
+-- ADMIN receives every permission.
+INSERT INTO health.role_permission (
+    role_id,
+    permission_id
+)
+SELECT
+    role.id,
+    permission.id
+FROM health.app_role role
+CROSS JOIN health.permission permission
+WHERE role.code = 'ADMIN'
+ON CONFLICT DO NOTHING;
+
+
+-- COUNTRY_ADMIN permissions.
+INSERT INTO health.role_permission (
+    role_id,
+    permission_id
+)
+SELECT
+    role.id,
+    permission.id
+FROM health.app_role role
+JOIN health.permission permission
+    ON permission.code IN (
+        'VIEW_COUNTRY',
+        'VIEW_APPLICATION',
+        'MANAGE_APPLICATION',
+        'VIEW_ENVIRONMENT',
+        'MANAGE_ENVIRONMENT',
+        'VIEW_COMPONENT',
+        'MANAGE_COMPONENT',
+        'VIEW_HEALTH_STATUS',
+        'MANAGE_MONITORING_CONFIG',
+        'VIEW_INCIDENT',
+        'ACKNOWLEDGE_INCIDENT',
+        'INVESTIGATE_INCIDENT',
+        'RESOLVE_INCIDENT'
+    )
+WHERE role.code = 'COUNTRY_ADMIN'
+ON CONFLICT DO NOTHING;
+
+
+-- OPERATOR permissions.
+INSERT INTO health.role_permission (
+    role_id,
+    permission_id
+)
+SELECT
+    role.id,
+    permission.id
+FROM health.app_role role
+JOIN health.permission permission
+    ON permission.code IN (
+        'VIEW_COUNTRY',
+        'VIEW_APPLICATION',
+        'VIEW_ENVIRONMENT',
+        'VIEW_COMPONENT',
+        'VIEW_HEALTH_STATUS',
+        'VIEW_INCIDENT',
+        'ACKNOWLEDGE_INCIDENT',
+        'INVESTIGATE_INCIDENT',
+        'RESOLVE_INCIDENT'
+    )
+WHERE role.code = 'OPERATOR'
+ON CONFLICT DO NOTHING;
+
+
+-- VIEWER permissions.
+INSERT INTO health.role_permission (
+    role_id,
+    permission_id
+)
+SELECT
+    role.id,
+    permission.id
+FROM health.app_role role
+JOIN health.permission permission
+    ON permission.code IN (
+        'VIEW_COUNTRY',
+        'VIEW_APPLICATION',
+        'VIEW_ENVIRONMENT',
+        'VIEW_COMPONENT',
+        'VIEW_HEALTH_STATUS',
+        'VIEW_INCIDENT'
+    )
+WHERE role.code = 'VIEWER'
+ON CONFLICT DO NOTHING;
+
+
+COMMIT;s

@@ -1,0 +1,3 @@
+import express from 'express'; import helmet from 'helmet'; import cors from 'cors'; import rateLimit from 'express-rate-limit'; import { env } from './config/env.js'; import { requestLogger } from './utils/logger.js'; import routes from './routes/index.js'; import { notFound,errorHandler } from './middleware/error.middleware.js';
+export const app=express();
+app.disable('x-powered-by');app.use(requestLogger);app.use(helmet());app.use(cors({origin:env.CORS_ORIGINS.split(',')}));app.use(express.json({limit:'256kb'}));app.use('/api/v1/auth',rateLimit({windowMs:15*60*1000,limit:20,standardHeaders:true,legacyHeaders:false}));app.get('/healthz',(req,res)=>res.json({status:'UP'}));app.use('/api/v1',routes);app.use(notFound);app.use(errorHandler);

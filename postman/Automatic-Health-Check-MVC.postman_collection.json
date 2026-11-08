@@ -1,0 +1,198 @@
+{
+  "info": {
+    "name": "Automatic Health Check MVC API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "My profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/me",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Countries",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/countries",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Applications",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/applications?countryId=1",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create application",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/applications",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"countryId\": 1,\n  \"name\": \"In-store\",\n  \"code\": \"INSTORE\",\n  \"ownerTeam\": \"Platform Operations\",\n  \"documentationUrl\": \"https://example.com/runbook\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create environment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/environments",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicationId\": 1,\n  \"name\": \"PRODUCTION\",\n  \"baseUrl\": \"https://instore.example.com\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create encrypted component",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/components",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"environmentId\": 1,\n  \"name\": \"Production PostgreSQL\",\n  \"componentType\": \"DATABASE\",\n  \"isCritical\": true,\n  \"sensitiveData\": {\n    \"hostName\": \"db.internal.example\",\n    \"port\": 5432,\n    \"technology\": \"PostgreSQL\",\n    \"version\": \"17\",\n    \"secretReference\": \"azure-key-vault://health/prod-db\"\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "List components",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/components?environmentId=1",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      }
+    }
+  ]
+}

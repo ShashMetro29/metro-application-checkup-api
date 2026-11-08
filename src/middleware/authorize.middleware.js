@@ -1,0 +1,2 @@
+import { AuthorizationService } from '../services/authorization.service.js'; import { AppError } from '../utils/app-error.js';
+export const authorize=(...permissions)=>async(req,res,next)=>{try{if(req.user.is_superuser)return next();const ok=await AuthorizationService.hasAnyPermission(req.user.id,permissions);if(!ok)throw new AppError(403,'Permission denied','FORBIDDEN');next();}catch(e){next(e);}};

@@ -1,0 +1,1 @@
+import { ComponentService } from '../services/component.service.js'; export const ComponentController={create:async(req,res)=>res.status(201).json(await ComponentService.create(req.user,req.validated.body)),list:async(req,res)=>res.json(await ComponentService.list(req.user,Number(req.query.environmentId)))};
