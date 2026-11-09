@@ -1,4 +1,19 @@
 import { db } from '../config/database.js';
+import { checkComponentHealth, checkUrlHealth } from '../utils/health.util.js';
+
+const hydrateAppEnvironment = async environment => {
+  const componentRows = environment.components || [];
+  const components = await Promise.all(componentRows.map(async component => ({
+    ...component,
+    health: await checkComponentHealth(component)
+  })));
+
+  return {
+    ...environment,
+    health: await checkUrlHealth(environment.base_url),
+    components
+  };
+};
 
 export const ApplicationModel = {
   listByCountry: async countryId => (await db.query('SELECT * FROM health.application WHERE country_id=$1 AND deleted_at IS NULL ORDER BY name', [countryId])).rows,
@@ -89,10 +104,12 @@ export const ApplicationModel = {
       return acc;
     }, {});
 
-    return applications.map(app => ({
+    const hydrated = await Promise.all(applications.map(async app => ({
       ...app,
-      environments: environmentsByApp[Number(app.id)] || []
-    }));
+      environments: await Promise.all((environmentsByApp[Number(app.id)] || []).map(async environment => hydrateAppEnvironment(environment)))
+    })));
+
+    return hydrated;
   },
 
   findById: async id => {
@@ -167,10 +184,10 @@ export const ApplicationModel = {
 
     return {
       ...application,
-      environments: environments.map(environment => ({
+      environments: await Promise.all(environments.map(async environment => hydrateAppEnvironment({
         ...environment,
         components: componentsByEnv[Number(environment.id)] || []
-      }))
+      })))
     };
   }
 };
