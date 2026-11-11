@@ -8,7 +8,10 @@ export const pool = new pg.Pool({
   ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false
 });
 pool.on('error', error => console.error('PostgreSQL pool error', error));
-export const db = { query: (text, params=[]) => pool.query(text, params) };
+export const db = {
+  query: (text, params = []) => pool.query(text, params),
+  connect: () => pool.connect()
+};
 export async function transaction(callback) {
   const client = await pool.connect();
   try { await client.query('BEGIN'); const result = await callback(client); await client.query('COMMIT'); return result; }
