@@ -1,4 +1,4 @@
-import { db } from '../config/database.js';
+import { db, transaction } from '../config/database.js';
 import { checkComponentHealth, checkUrlHealth } from '../utils/health.util.js';
 
 const hydrateAppEnvironment = async environment => {
@@ -18,7 +18,77 @@ const hydrateAppEnvironment = async environment => {
 export const ApplicationModel = {
   listByCountry: async countryId => (await db.query('SELECT * FROM health.application WHERE country_id=$1 AND deleted_at IS NULL ORDER BY name', [countryId])).rows,
 
-  create: async b => (await db.query('INSERT INTO health.application(country_id,name,code,description,owner_team,documentation_url) VALUES($1,$2,$3,$4,$5,$6) RETURNING *', [b.countryId, b.name, b.code, b.description || null, b.ownerTeam || null, b.documentationUrl || null])).rows[0],
+  create: async b => {
+    if (!b.environments || !b.environments.length) {
+      return (await db.query('INSERT INTO health.application(country_id,name,code,description,owner_team,documentation_url) VALUES($1,$2,$3,$4,$5,$6) RETURNING *', [b.countryId, b.name, b.code, b.description || null, b.ownerTeam || null, b.documentationUrl || null])).rows[0];
+    }
+
+    return transaction(async client => {
+      const appResult = await client.query(
+        'INSERT INTO health.application(country_id,name,code,description,owner_team,documentation_url) VALUES($1,$2,$3,$4,$5,$6) RETURNING *',
+        [b.countryId, b.name, b.code, b.description || null, b.ownerTeam || null, b.documentationUrl || null]
+      );
+
+      const app = appResult.rows[0];
+      const createdEnvironments = [];
+
+      for (const environment of b.environments) {
+        const envResult = await client.query(
+          'INSERT INTO health.environment(application_id,name,base_url,enabled) VALUES($1,$2,$3,$4) RETURNING *',
+          [app.id, environment.name, environment.baseUrl || null, environment.enabled ?? true]
+        );
+
+        const environmentRow = envResult.rows[0];
+        const createdComponents = [];
+
+        for (const component of environment.components || []) {
+          const componentResult = await client.query(
+            `INSERT INTO health.component (
+              environment_id,
+              name,
+              component_type,
+              endpoint,
+              host_name,
+              port,
+              instance_number,
+              technology,
+              version,
+              is_critical,
+              enabled,
+              created_at,
+              updated_at
+            ) VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            ) RETURNING *`,
+            [
+              environmentRow.id,
+              component.name,
+              component.componentType,
+              component.endpoint || null,
+              component.hostName || null,
+              component.port ?? null,
+              component.instanceNumber ?? null,
+              component.technology || null,
+              component.version || null,
+              component.isCritical ?? true,
+              component.enabled ?? true
+            ]
+          );
+          createdComponents.push(componentResult.rows[0]);
+        }
+
+        createdEnvironments.push({
+          ...environmentRow,
+          components: createdComponents
+        });
+      }
+
+      return {
+        ...app,
+        environments: createdEnvironments
+      };
+    });
+  },
 
   findCountryId: async id => (await db.query('SELECT country_id FROM health.application WHERE id=$1 AND deleted_at IS NULL', [id])).rows[0]?.country_id,
 

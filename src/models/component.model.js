@@ -27,7 +27,7 @@ export const ComponentModel = {
       $8,
       $9,
       $10,
-      TRUE,
+      $11,
       CURRENT_TIMESTAMP,
       CURRENT_TIMESTAMP
     ) RETURNING id, environment_id, name, component_type, endpoint, host_name, port, instance_number, technology, version, is_critical, enabled, created_at, updated_at`,
@@ -41,7 +41,8 @@ export const ComponentModel = {
       b.instanceNumber ?? null,
       b.technology || null,
       b.version || null,
-      b.isCritical ?? true
+      b.isCritical ?? true,
+      b.enabled ?? true
     ]
   )).rows[0],
 
