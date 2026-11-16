@@ -1,0 +1,293 @@
+{
+	"info": {
+		"_postman_id": "c400d60b-ea15-47c6-bbd7-d2b06077bdc4",
+		"name": "In-Store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "57407727"
+	},
+	"item": [
+		{
+			"name": "articleOrderPlan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"consumer\": \"TEST\",\r\n    \"country\": \"FR\",\r\n    \"salesLine\": \"MCC\",\r\n    \"locationIds\": [\r\n        113\r\n    ],\r\n    \"articles\": [\r\n        {\r\n            \"articleNo\": 361,\r\n            \"variant\": 1,\r\n            \"bundleNo\": 2\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://order-plan.movie-pp.metro.digital/v1/orderPlan/articleOrderPlan",
+					"protocol": "https",
+					"host": [
+						"order-plan",
+						"movie-pp",
+						"metro",
+						"digital"
+					],
+					"path": [
+						"v1",
+						"orderPlan",
+						"articleOrderPlan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "articleOrderPlan",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "{\"consumer\":\"TEST\",\"country\":\"FR\",\"salesLine\":\"MCC\",\"locationIds\":[113],\"articles\":[{\"articleNo\":361,\"variant\":1,\"bundleNo\":2}]}",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://orderplan.mop-pp.metro.digital/v1/orderPlan/articleOrderPlan",
+					"protocol": "https",
+					"host": [
+						"orderplan",
+						"mop-pp",
+						"metro",
+						"digital"
+					],
+					"path": [
+						"v1",
+						"orderPlan",
+						"articleOrderPlan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "access_token",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "BHMvT48WP4",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "NL_CUSTOMER_ORDERING_APP",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic your_client:your_secret"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "NL_CUSTOMER_ORDERING_APP",
+							"type": "text"
+						},
+						{
+							"key": "realm_id",
+							"value": "NL_APP",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://idam.metrosystems.net/authorize/api/oauth2/access_token",
+					"protocol": "https",
+					"host": [
+						"idam",
+						"metrosystems",
+						"net"
+					],
+					"path": [
+						"authorize",
+						"api",
+						"oauth2",
+						"access_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "access_token Copy",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "BHMvT48WP4",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "NL_CUSTOMER_ORDERING_APP",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic your_client:your_secret"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "NL_CUSTOMER_ORDERING_APP",
+							"type": "text"
+						},
+						{
+							"key": "realm_id",
+							"value": "NL_APP",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://idam.metrosystems.net/authorize/api/oauth2/access_token",
+					"protocol": "https",
+					"host": [
+						"idam",
+						"metrosystems",
+						"net"
+					],
+					"path": [
+						"authorize",
+						"api",
+						"oauth2",
+						"access_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "access_token Copy 2",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "BHMvT48WP4",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "NL_CUSTOMER_ORDERING_APP",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic your_client:your_secret"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "NL_CUSTOMER_ORDERING_APP",
+							"type": "text"
+						},
+						{
+							"key": "realm_id",
+							"value": "NL_APP",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://idam.metrosystems.net/authorize/api/oauth2/access_token",
+					"protocol": "https",
+					"host": [
+						"idam",
+						"metrosystems",
+						"net"
+					],
+					"path": [
+						"authorize",
+						"api",
+						"oauth2",
+						"access_token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,951 @@
+{
+	"info": {
+		"_postman_id": "f60cf76f-07c0-4c9a-a27b-5520646e559f",
+		"name": "Automatic Health Check MVC API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "57407727"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "// {\n//   \"email\":\"flow.verify@example.com\",\n//   \"password\":\"StrongPass123!\"\n// }\n{\n    \"email\": \"superadmin@example.com\",\n    \"password\": \"StrongPassword123!\"\n  }\n\n\n// {\n//   \"email\":\"flowtwo@gmail.com\",\n//   \"password\":\"flowTwo@1234\"\n// }"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "// {\n//   \"email\": \"shash@example.com\",\n//   \"password\": \"SPass13!\",\n//   \"display_name\": \"Shashank Kalyani\",\n//   \"country_id\": 1\n// }\n"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/auth/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup_Superuser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "// {\n//   \"email\": \"shash@example.com\",\n//   \"password\": \"SPass13!\",\n//   \"display_name\": \"Shashank Kalyani\",\n//   \"country_id\": 1\n// }\n"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/auth/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "application",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNCIsImVtYWlsIjoic2hhc2hAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTQxMTk3MTMsImV4cCI6MTc5NDEyMDYxMywiYXVkIjoiYXV0b2lhdGljLWhlYWx0aC1jaGVjay1yZWFjdCIsImlzcyI6ImF1dG9tYXRpYy10ZWFsdGgtY2hlY2stYXBpIn0.5XhDnliu7T0ehO2KTmk73lraSSu8DUpuMFCIhRLfXpc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"countryId\": 8,\n    \"name\": \"supplier portal\",\n    \"code\": \"NL\",\n    \"description\": \"NL\",\n    \"ownerTeam\": \"Manisha\",\n    \"documentationUrl\": \"https://xyz.com\",\n    \"environments\": [\n        {\n            \"name\": \"PRE_PRODUCTION\",\n            \"baseUrl\": \"https://supplierportal.makro.nl/porta\",\n            \"enabled\": true,\n            \"components\": [\n                {\n                    \"name\": \"SERVER\",\n                    \"componentType\": \"APPLICATION_SERVER\",\n                    \"endpoint\": \"https://supplierportal.makro.nl/porta\",\n                    \"hostName\": \"10.4.3.4.4\",\n                    \"port\": 5432,\n                    \"technology\": \"SAAS\",\n                    \"version\": \"4.4\",\n                    \"isCritical\": true,\n                    \"enabled\": true\n                }\n            ]\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/applications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"applications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "application with Component",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMyIsImVtYWlsIjoiZmxvdy52ZXJpZnlAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTQzOTQ1MDIsImV4cCI6MTc5NDM5ODEwMiwiYXVkIjoiYXV0b21hdGljLWhlYWx0aC1jaGVjay1yZWFjdCIsImlzcyI6ImF1dG9tYXRpYy1oZWFsdGgtY2hlY2stYXBpIn0.bTqn8lmhCoBBiYMIFWWZMvNM9jDOfkS55sQecpM-7OI",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"countryId\": 1,\n    \"name\": \"Metross Billingff\",\n    \"code\": \"metro-billidd\",\n    \"description\": \"Billing platform\",\n    \"ownerTeam\": \"Platform\",\n    \"documentationUrl\": \"https://example.com/docs\",\n    \"environments\": [\n      {\n        \"name\": \"PRODUCTION\",\n        \"baseUrl\": \"https://billing.example.com\",\n        \"components\": [\n          {\n            \"name\": \"API Gateway\",\n            \"componentType\": \"APPLICATION_SERVER\",\n            \"endpoint\": \"https://billing.example.com/health\",\n            \"isCritical\": true\n          },\n          {\n            \"name\": \"PostgreSQL\",\n            \"componentType\": \"DATABASE\",\n            \"hostName\": \"db.internal\",\n            \"port\": 5432,\n            \"technology\": \"POSTGRES\",\n            \"version\": \"15\"\n          }\n        ]\n      },\n      {\n        \"name\": \"PRE_PRODUCTION\",\n        \"baseUrl\": \"https://billing-preprod.example.com\",\n        \"components\": [\n          {\n            \"name\": \"Message Broker\",\n            \"componentType\": \"INTERFACE\",\n            \"hostName\": \"mq.internal\",\n            \"port\": 5672,\n            \"technology\": \"RABBITMQ\",\n            \"version\": \"3.13\"\n          }\n        ]\n      }\n    ]\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/applications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"applications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "environment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMCIsImVtYWlsIjoibWFuaXNoYUB0Y3MuY29tIiwiaWF0IjoxNzk0NDc0NjAyLCJleHAiOjE3OTQ0NzU1MDIsImF1ZCI6ImF1dG9tYXRpYy1oZWFsdGgtY2hlY2stcmVhY3QiLCJpc3MiOiJhdXRvbWF0aWMtaGVhbHRoLWNoZWNrLWFwaSJ9.tFhodQGxKspNK2Rz5ub6RBfR1YKYLNXmKbQdnN2cpgA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNCIsImVtYWlsIjoic2hhc2hAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTQxMTk3MTMsImV4cCI6MTc5NDEyMDYxMywiYXVkIjoiYXV0b2lhdGljLWhlYWx0aC1jaGVjay1yZWFjdCIsImlzcyI6ImF1dG9tYXRpYy10ZWFsdGgtY2hlY2stYXBpIn0.5XhDnliu7T0ehO2KTmk73lraSSu8DUpuMFCIhRLfXpc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\"applicationId\": 30,\n  \"name\": \"PRODUCTION\",\n  \"baseUrl\": \"https://amazon.example.com\",\n  \"enabled\": true}"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/environments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"environments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "components",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMCIsImVtYWlsIjoibWFuaXNoYUB0Y3MuY29tIiwiaWF0IjoxNzk0NDc0NjAyLCJleHAiOjE3OTQ0NzU1MDIsImF1ZCI6ImF1dG9tYXRpYy1oZWFsdGgtY2hlY2stcmVhY3QiLCJpc3MiOiJhdXRvbWF0aWMtaGVhbHRoLWNoZWNrLWFwaSJ9.tFhodQGxKspNK2Rz5ub6RBfR1YKYLNXmKbQdnN2cpgA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNCIsImVtYWlsIjoic2hhc2hAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTQxMTk3MTMsImV4cCI6MTc5NDEyMDYxMywiYXVkIjoiYXV0b2lhdGljLWhlYWx0aC1jaGVjay1yZWFjdCIsImlzcyI6ImF1dG9tYXRpYy10ZWFsdGgtY2hlY2stYXBpIn0.5XhDnliu7T0ehO2KTmk73lraSSu8DUpuMFCIhRLfXpc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"environmentId\": 14,\n  \"name\": \"PostgreSQs Primary\",\n  \"componentType\": \"DATABASE\",\n  \"hostName\": \"db-primary.internal\",\n  \"port\": 5432,\n  \"technology\": \"PostgreSQL\",\n  \"version\": \"15\",\n  \"isCritical\": true\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/components",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"components"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/details?countryId=1",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMyIsImVtYWlsIjoiZmxvdy52ZXJpZnlAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTQyMDExODEsImV4cCI6MTc5NDIwMjA4MSwiYXVkIjoiYXV0b21hdGljLWhlYWx0aC1jaGVjay1yZWFjdCIsImlzcyI6ImF1dG9tYXRpYy1oZWFsdGgtY2hlY2stYXBpIn0.OgqaL83hYDu48BJJgUkGUnL97pxwaXPdvLg1hmNZa"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3001/api/v1/applications/details?countryId=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						"details"
+					],
+					"query": [
+						{
+							"key": "countryId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "applications/3",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMyIsImVtYWlsIjoiZmxvdy52ZXJpZnlAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTQyMDExODEsImV4cCI6MTc5NDIwMjA4MSwiYXVkIjoiYXV0b21hdGljLWhlYWx0aC1jaGVjay1yZWFjdCIsImlzcyI6ImF1dG9tYXRpYy1oZWFsdGgtY2hlY2stYXBpIn0.OgqaL83hYDu48BJJgUkGUnL97pxwaXPdvLg1hmNZa4E"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3001/api/v1/applications/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const r=pm.response.json(); if(r.accessToken) pm.collectionVariables.set('accessToken',r.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "My profile",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Countries",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Applications",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create application",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"countryId\": 1,\n  \"name\": \"In-store\",\n  \"code\": \"INSTORE\",\n  \"ownerTeam\": \"Platform Operations\",\n  \"documentationUrl\": \"https://example.com/runbook\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create environment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"applicationId\": 1,\n  \"name\": \"PRODUCTION\",\n  \"baseUrl\": \"https://instore.example.com\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create encrypted component",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"environmentId\": 1,\n  \"name\": \"Production PostgreSQL\",\n  \"componentType\": \"DATABASE\",\n  \"isCritical\": true,\n  \"sensitiveData\": {\n    \"hostName\": \"db.internal.example\",\n    \"port\": 5432,\n    \"technology\": \"PostgreSQL\",\n    \"version\": \"17\",\n    \"secretReference\": \"azure-key-vault://health/prod-db\"\n  }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List components",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}",
+					"host": [
+						"{{baseUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "create environments later",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"applicationId\": 1,\r\n    \"name\": \"PRODUCTION\",\r\n    \"baseUrl\": \"https://billing-api.example.com\",\r\n    \"components\": [\r\n      {\r\n        \"name\": \"Redis Cache\",\r\n        \"componentType\": \"INTERFACE\",\r\n        \"hostName\": \"cache.internal\",\r\n        \"port\": 6379,\r\n        \"technology\": \"REDIS\"\r\n      }\r\n    ]\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/environments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"environments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add component later to an existing environment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"environmentId\": 1,\r\n    \"name\": \"Payment API\",\r\n    \"componentType\": \"APPLICATION_SERVER\",\r\n    \"endpoint\": \"https://billing.example.com/payment/health\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/components",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"components"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getApplications",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/applications/details?countryId=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						"details"
+					],
+					"query": [
+						{
+							"key": "countryId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit_application",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Updated billing platform\",\r\n    \"documentationUrl\": \"https://example.com/billing-docs\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/applications/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit_Environment",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"baseUrl\": \"https://billing.example.com/v2\",\r\n    \"enabled\": true\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/environments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"environments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit_Component",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"API Gateway v2\",\r\n    \"enabled\": true,\r\n    \"isCritical\": true\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/components/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"components",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_Component",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3001/api/v1/components/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"components",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_Environment",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/environments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"environments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_Applications",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <TOKEN>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/applications/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMCIsImVtYWlsIjoibWFuaXNoYUB0Y3MuY29tIiwiaWF0IjoxNzk0NDcwNDIzLCJleHAiOjE3OTQ0NzEzMjMsImF1ZCI6ImF1dG9tYXRpYy1oZWFsdGgtY2hlY2stcmVhY3QiLCJpc3MiOiJhdXRvbWF0aWMtaGVhbHRoLWNoZWNrLWFwaSJ9.pz2DrkgA3UAuRNpLTe7GS4KFYKbMoO2Po8BAdDCMuTE",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"countryId\": 8,\r\n    \"name\": \"supplier portal\",\r\n    \"code\": \"NL\",\r\n    \"description\": \"NL\",\r\n    \"ownerTeam\": \"Manisha\",\r\n    \"documentationUrl\": \"https://xyz.com\",\r\n    \"environments\": [\r\n        {\r\n            \"name\": \"PRE_PRODUCTION\",\r\n            \"baseUrl\": \"https://supplierportal.makro.nl/porta\",\r\n            \"enabled\": true,\r\n            \"components\": [\r\n                {\r\n                    \"name\": \"SERVER\",\r\n                    \"componentType\": \"APPLICATION_SERVER\",\r\n                    \"endpoint\": \"https://supplierportal.makro.nl/porta\",\r\n                    \"hostName\": \"10.4.3.4.4\",\r\n                    \"port\": 5432,\r\n                    \"technology\": \"SAAS\",\r\n                    \"version\": \"4.4\",\r\n                    \"isCritical\": true,\r\n                    \"enabled\": true\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1/applications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1",
+						"applications"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		}
+	]
+}

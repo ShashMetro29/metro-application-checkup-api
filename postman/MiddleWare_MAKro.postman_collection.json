@@ -1,0 +1,322 @@
+{
+	"info": {
+		"_postman_id": "d766cf21-d8a0-44b1-a3b2-e6741e04b227",
+		"name": "MiddleWare_MAKro",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "57407727"
+	},
+	"item": [
+		{
+			"name": "api/v1.0/auth",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\": \"integration_07\",\r\n    \"password\": \"sdsd4tyUt\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.26.252.161:3000/api/v1.0/auth",
+					"protocol": "http",
+					"host": [
+						"10",
+						"26",
+						"252",
+						"161"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1.0",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1.0/auth Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\": \"integration_06\",\r\n    \"password\": \"PassP1TYu\"\r\n    //\"password\": \"Tye1YsUk(\"\r\n    //\"password\": \"rTyrSv4E)y\"\r\n    //\"password\": \"PoUy6gtR\"\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.26.252.204:3000/api/v1.0/auth",
+					"protocol": "http",
+					"host": [
+						"10",
+						"26",
+						"252",
+						"204"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1.0",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "vouchers",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\": \"tomek\",\r\n    \"password\": \"T7xgnb\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.26.252.204:3000/api/v1.0/auth",
+					"protocol": "http",
+					"host": [
+						"10",
+						"26",
+						"252",
+						"204"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1.0",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "vouchers Copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYXV0aDB8dW5kZWZpbmVkIiwidXNlcm5hbWUiOiJ0b21layIsInJvbGVzIjpbImN1c3RvbWVyIiwibWFya2V0aW5nIiwiYXJ0aWNsZSIsImxvdHRlcnkiLCJSMDAwMSIsIlIwMDAyIiwiUjAwMDMiLCJSMDAwNCIsIlIwMDA1IiwiUjAwMDYiLCJSMDAwNyIsIlIwMDA4IiwiUjAwMDkiLCJSMDAxMCIsIlIwMDEyIiwiUjAwMTMiLCJSMDAxNCIsIlIwMDE1IiwiUjAwMTYiLCJSMDAxNyIsIlIwMDE4IiwiUjAwMTkiLCJSMDAyMCIsIlIwMDIyIiwiUjAwMjMiLCJSMDAyNCIsIlIwMDI1IiwiUjAwMjYiLCJSMDAyNyIsIlIwMDI4IiwiUjAwMjkiLCJSMDAzMCIsIlIwMDMxIiwiUjAwMzIiLCJSMDAzMyIsIlIwMDM0IiwiUjAwMzUiLCJSMDAzNiIsIlIwMDM3IiwiUjAwMzgiLCJSMDAzOSIsIlIwMDQwIiwiUjAwNDEiLCJSMDA0MiIsIlIwMDQzIl0sImlhdCI6MTc5MjM4OTI0NCwiZXhwIjoxNzkyNDc1NjQ0fQ.Onm4dSOaOKU6HXvc_L8KHSiX15olniJeJiG1IirdPjM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\": \"tomek\",\r\n    \"password\": \"T7xgnb\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1.0/wallet/700295/store/001/person/1/vouchers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1.0",
+						"wallet",
+						"700295",
+						"store",
+						"001",
+						"person",
+						"1",
+						"vouchers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "vouchers Copy 2",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYXV0aDB8dW5kZWZpbmVkIiwidXNlcm5hbWUiOiJ0b21layIsInJvbGVzIjpbImN1c3RvbWVyIiwibWFya2V0aW5nIiwiYXJ0aWNsZSIsImxvdHRlcnkiLCJSMDAwMSIsIlIwMDAyIiwiUjAwMDMiLCJSMDAwNCIsIlIwMDA1IiwiUjAwMDYiLCJSMDAwNyIsIlIwMDA4IiwiUjAwMDkiLCJSMDAxMCIsIlIwMDEyIiwiUjAwMTMiLCJSMDAxNCIsIlIwMDE1IiwiUjAwMTYiLCJSMDAxNyIsIlIwMDE4IiwiUjAwMTkiLCJSMDAyMCIsIlIwMDIyIiwiUjAwMjMiLCJSMDAyNCIsIlIwMDI1IiwiUjAwMjYiLCJSMDAyNyIsIlIwMDI4IiwiUjAwMjkiLCJSMDAzMCIsIlIwMDMxIiwiUjAwMzIiLCJSMDAzMyIsIlIwMDM0IiwiUjAwMzUiLCJSMDAzNiIsIlIwMDM3IiwiUjAwMzgiLCJSMDAzOSIsIlIwMDQwIiwiUjAwNDEiLCJSMDA0MiIsIlIwMDQzIl0sImlhdCI6MTc5MjM4OTI0NCwiZXhwIjoxNzkyNDc1NjQ0fQ.Onm4dSOaOKU6HXvc_L8KHSiX15olniJeJiG1IirdPjM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\": \"tomek\",\r\n    \"password\": \"T7xgnb\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/api/v1.0/wallet/700295/store/001/person/1/vouchers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"v1.0",
+						"wallet",
+						"700295",
+						"store",
+						"001",
+						"person",
+						"1",
+						"vouchers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "queryAllRedeemables",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "queryAllRedeemables",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRva2VuLXNpZ25pbmcta2V5cGFpcl8xN18xMl8yMDI1In0.eyJpYXQiOjE3OTI1NjYyNjMsInVzZXJUeXBlIjoiQ0xJRU5UIiwiaXNzIjoiaHR0cHM6Ly9pZGFtLm1ldHJvc3lzdGVtcy5uZXQiLCJleHAiOjE3OTI1Njk4NjMsImF1dGhvcml6YXRpb24iOlt7IjNWX0FQSV9SRE1fUkVBREVSIjpbXX0seyIzVl9BUElfQ1BHX1JFQURFUiI6W119LHsiM1ZfQVBJX0NVU1RfVFJHX1JFQURFUiI6W119XSwic3ViIjoiTUNDX1BMIiwicmVhbG0iOiIzVl9SRUFMTSJ9.HcmMTIXocvEEQOC1TjGm-Zd7jw41zJOpiDtKReKFLNlgexRx3o1bRTs_wY-ZTjmU2_7d2GvJzUJR0hw0YTuJ142FbA5rtdC6VXSyjwMm7Ei1Q09jJwpbAHyPharu9F25vI_0YXhVTRCc7jnl7f2lR863Xn2GwBsaClRt2zPT8k3x1dg16CD-kIbdh3IwRuVEwe05tVx-gdjrCFuNN3LtPe_p8xJNC40PszTXebU48gzPTmahIevS2psY5HQ-zWSzl40B4Fwgv3OG9D6Vue2VdWt-UWqYMUIlzvMatCtz5tmLzaMn222aYh9X3U3lroXjbkLL3RaTFkjC_NLJTiSmLw"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"countryCode\": \"POL\",\r\n    \"requestTime\": \"2026-10-08T13:11:33+02:00\",\r\n    \"gcn\": \"5900884037015\",\r\n    \"campaignStart\": \"2026-09-03T00:00:00+02:00\",\r\n   \"loyaltyReference\": {\r\n\t\t\"homeStore\": \"11\",\r\n\t\t\"customerNo\": \"145294\",\r\n\t\t\"cardholders\": [\r\n\t\t\t\"1\"\r\n\t\t],\r\n\t\t\"type\": \"MCC\"\r\n\t},\r\n    \"location\": {\r\n        \"id\": \"http://www.metrogroup.de/urn/mcc/pol/readpoint/loc/couponcenter\",\r\n        \"type\": \"SGLN\"\r\n    },\r\n    \"transactionIdentifier\": \"0/0(015)0002/006938\"\r\n}"
+				},
+				"url": {
+					"raw": "https://new-proxy.cf-vvv-prod-rd.cf.metro.cloud/3v.redeemable.service.rest/queryAllRedeemables",
+					"protocol": "https",
+					"host": [
+						"new-proxy",
+						"cf-vvv-prod-rd",
+						"cf",
+						"metro",
+						"cloud"
+					],
+					"path": [
+						"3v.redeemable.service.rest",
+						"queryAllRedeemables"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "queryAllRedeemables Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRva2VuLXNpZ25pbmcta2V5cGFpcl8xN18xMl8yMDI1In0.eyJpYXQiOjE3OTI1NjYyNjMsInVzZXJUeXBlIjoiQ0xJRU5UIiwiaXNzIjoiaHR0cHM6Ly9pZGFtLm1ldHJvc3lzdGVtcy5uZXQiLCJleHAiOjE3OTI1Njk4NjMsImF1dGhvcml6YXRpb24iOlt7IjNWX0FQSV9SRE1fUkVBREVSIjpbXX0seyIzVl9BUElfQ1BHX1JFQURFUiI6W119LHsiM1ZfQVBJX0NVU1RfVFJHX1JFQURFUiI6W119XSwic3ViIjoiTUNDX1BMIiwicmVhbG0iOiIzVl9SRUFMTSJ9.HcmMTIXocvEEQOC1TjGm-Zd7jw41zJOpiDtKReKFLNlgexRx3o1bRTs_wY-ZTjmU2_7d2GvJzUJR0hw0YTuJ142FbA5rtdC6VXSyjwMm7Ei1Q09jJwpbAHyPharu9F25vI_0YXhVTRCc7jnl7f2lR863Xn2GwBsaClRt2zPT8k3x1dg16CD-kIbdh3IwRuVEwe05tVx-gdjrCFuNN3LtPe_p8xJNC40PszTXebU48gzPTmahIevS2psY5HQ-zWSzl40B4Fwgv3OG9D6Vue2VdWt-UWqYMUIlzvMatCtz5tmLzaMn222aYh9X3U3lroXjbkLL3RaTFkjC_NLJTiSmLw"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"countryCode\": \"POL\",\r\n    \"requestTime\": \"2026-10-08T13:11:33+02:00\",\r\n    \"gcn\": \"5900884037015\",\r\n    \"campaignStart\": \"2026-09-03T00:00:00+02:00\",\r\n   \"loyaltyReference\": {\r\n\t\t\"homeStore\": \"11\",\r\n\t\t\"customerNo\": \"145294\",\r\n\t\t\"cardholders\": [\r\n\t\t\t\"1\"\r\n\t\t],\r\n\t\t\"type\": \"MCC\"\r\n\t},\r\n    \"location\": {\r\n        \"id\": \"http://www.metrogroup.de/urn/mcc/pol/readpoint/loc/couponcenter\",\r\n        \"type\": \"SGLN\"\r\n    },\r\n    \"transactionIdentifier\": \"0/0(015)0002/006938\"\r\n}"
+				},
+				"url": {
+					"raw": "https://new-proxy.cf-vvv-prod-rd.cf.metro.cloud/3v.redeemable.service.rest/queryAllRedeemables",
+					"protocol": "https",
+					"host": [
+						"new-proxy",
+						"cf-vvv-prod-rd",
+						"cf",
+						"metro",
+						"cloud"
+					],
+					"path": [
+						"3v.redeemable.service.rest",
+						"queryAllRedeemables"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "queryAllRedeemables Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRva2VuLXNpZ25pbmcta2V5cGFpcl8xN18xMl8yMDI1In0.eyJpYXQiOjE3OTI1NjYyNjMsInVzZXJUeXBlIjoiQ0xJRU5UIiwiaXNzIjoiaHR0cHM6Ly9pZGFtLm1ldHJvc3lzdGVtcy5uZXQiLCJleHAiOjE3OTI1Njk4NjMsImF1dGhvcml6YXRpb24iOlt7IjNWX0FQSV9SRE1fUkVBREVSIjpbXX0seyIzVl9BUElfQ1BHX1JFQURFUiI6W119LHsiM1ZfQVBJX0NVU1RfVFJHX1JFQURFUiI6W119XSwic3ViIjoiTUNDX1BMIiwicmVhbG0iOiIzVl9SRUFMTSJ9.HcmMTIXocvEEQOC1TjGm-Zd7jw41zJOpiDtKReKFLNlgexRx3o1bRTs_wY-ZTjmU2_7d2GvJzUJR0hw0YTuJ142FbA5rtdC6VXSyjwMm7Ei1Q09jJwpbAHyPharu9F25vI_0YXhVTRCc7jnl7f2lR863Xn2GwBsaClRt2zPT8k3x1dg16CD-kIbdh3IwRuVEwe05tVx-gdjrCFuNN3LtPe_p8xJNC40PszTXebU48gzPTmahIevS2psY5HQ-zWSzl40B4Fwgv3OG9D6Vue2VdWt-UWqYMUIlzvMatCtz5tmLzaMn222aYh9X3U3lroXjbkLL3RaTFkjC_NLJTiSmLw"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"countryCode\": \"DEU\",\r\n  \"homeStore\": \"13\",\r\n  \"customerNumber\": \"615157\",\r\n   \"cardHolderNumber\": \"2\"\r\n}"
+				},
+				"url": {
+					"raw": "https://3v-proxy-service-external-dev.metro-link.com/3v.campaign.manager.service.web/campaigns/validForCustomer%27",
+					"protocol": "https",
+					"host": [
+						"3v-proxy-service-external-dev",
+						"metro-link",
+						"com"
+					],
+					"path": [
+						"3v.campaign.manager.service.web",
+						"campaigns",
+						"validForCustomer%27"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validForCustomer",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
